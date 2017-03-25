@@ -9,8 +9,9 @@ import redis
 
 # some config
 PROXY_SIZE = 2000
-check_IP_URL = 'http://lwons.com/wx'
-Check_Spacing_Time = 600
+check_IP_URL = 'http://wenshu.court.gov.cn/'
+Check_Spacing_Time = 3600
+
 
 # redis config
 REDIS_DATABASE_NAME = 0

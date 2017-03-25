@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+from service import config
+import _mysql_exceptions
 class MySQLexe:
 
     @staticmethod
@@ -20,12 +22,12 @@ class MySQLexe:
     @staticmethod
     def delete_exe(conn, ip):
         # 删除数据表中一行
-        conn.cursor().execute("delete from ProxyPool_info1 where ip = '" + ip[0] + "'")
+        conn.cursor().execute("delete from " + config.PROXYPOOL_TABLENAME + " where ip = '" + ip[0] + "'")
         conn.commit()
 
     def Selete_Proxy_List(self, conn):
         cursor = conn.cursor()
-        collection = cursor.execute("select * from ProxyPool_info1")
+        collection = cursor.execute("select ip from " + config.PROXYPOOL_TABLENAME)
 
         content = []
         for row in cursor.fetchall():
@@ -42,8 +44,13 @@ class MySQLexe:
         return collection
 
     def Insert_Proxy_List(self, conn, proxy_list):
-        for ip in proxy_list:
-            conn.cursor().execute("insert into ProxyPool_info1 values ('"+ip+"')");
-
+        for proxy_info in proxy_list:
+            print proxy_info
+            try:
+                conn.cursor().execute(
+                    "INSERT INTO " + config.PROXYPOOL_TABLENAME + " VALUES ('" + proxy_info['ip'] + "', '" + str(
+                        proxy_info['ip_create_time']) + "', '" + proxy_info['is_high_quality'] + "')")
+            except _mysql_exceptions.IntegrityError, e:
+                print e
         # 提交到数据库执行
         conn.commit()
