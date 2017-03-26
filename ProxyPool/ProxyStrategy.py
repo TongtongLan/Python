@@ -10,6 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 from utils import HTTPHeaders
 from utils import config
+import config
 import time
 from datetime import datetime
 
@@ -38,15 +39,8 @@ class GetProxyStrategy(object):
 
 class Get66ipProxyStrategy(GetProxyStrategy):
 
-    URL = 'http://www.66ip.cn/nmtq.php?getnum=800&isp=0&anonymoustype=4&start=&ports=&export=&ipaddress=&area=1&proxytype=0&api=66ip'
+    URL = config.G66ip_URL
 
-    def HTTP_request(self, proxy_url):
-        session = requests.Session()
-        session.mount('https://', HTTPAdapter(max_retries=5))
-        session.mount('http://', HTTPAdapter(max_retries=5))
-        response = session.get(proxy_url, timeout=config.TIMEOUT)
-
-        return response
     def crawl_execute(self):
         self.content = self.HTTP_request(self.URL).text
         self.proxy_list = self.parse(self.content)
@@ -55,7 +49,6 @@ class Get66ipProxyStrategy(GetProxyStrategy):
 
     def parse(self, content):
         soup = BeautifulSoup(content, "html.parser")
-        proxy_info = {}
 
         proxy_list = []
         for br in soup.find_all('br'):
@@ -73,11 +66,9 @@ class GetxicidailiProxyStrategy(GetProxyStrategy):
     SPEED = 5
 
     def crawl_execute(self):
-        #print ('GetxicidailiProxyStrategy.crawl_execute().....')
         super(GetxicidailiProxyStrategy, self).crawl_execute()
         self.proxy_list = self.parse(self.content)
-        #print ('GetxicidailiProxyStrategy....')
-        #print (self.proxy_list)
+
         return self.proxy_list
 
     def parse(self, content):
@@ -98,11 +89,9 @@ class GetxicidailiProxyStrategy(GetProxyStrategy):
                 for num, data in enumerate(td_list):
                     if num == 1:
                         address = data.getText()
-                        #print (num, data.getText())
                     if num == 2:
                         port = data.getText()
                     if num == 4:
-                        #print (num, data.getText())
                         is_high_quality = data.getText().encode('utf-8') == s
                         if not is_high_quality:
                             continue
@@ -111,18 +100,8 @@ class GetxicidailiProxyStrategy(GetProxyStrategy):
                               'ip_create_time': current_time,
                               'is_high_quality': str(is_high_quality)
                               }
-                        #print proxy_info
                 if is_high_quality:
                     proxy_info_list.append(proxy_info)
-
-                    #print (num, data.getText())
-                    #print (address, port)
-                    #print (ip)
-        #print ('parse........')
-        #print (proxy_info_list)
-
-
-
 
         return proxy_info_list
 
@@ -130,7 +109,7 @@ class GetxicidailiProxyStrategy(GetProxyStrategy):
 
 class GetWNProxyStrategy(GetxicidailiProxyStrategy):
     SPEED = 80
-    URL = 'http://www.xicidaili.com/wn/'
+    URL = config.XICIDAIL_WN_URL
 
     def crawl_execute(self):
         super(GetWNProxyStrategy, self).crawl_execute()
@@ -140,16 +119,15 @@ class GetWNProxyStrategy(GetxicidailiProxyStrategy):
 class GetNNProxyStrategy(GetxicidailiProxyStrategy):
     SPEED = 85
 
-    URL = 'http://www.xicidaili.com/nn/'
+    URL = config.XICIDAIL_NN_URL
 
     def crawl_execute(self):
-        #print ('GetNNProxyStrategy.crawl_execute()......')
         super(GetNNProxyStrategy, self).crawl_execute()
         return self.proxy_list
 
 class GetWTProxyStrategy(GetxicidailiProxyStrategy):
     SPEED = 88
-    URL = 'http://www.xicidaili.com/wt/'
+    URL = config.XICIDAIL_WT_URL
     def crawl_execute(self):
         super(GetWTProxyStrategy, self).crawl_execute()
 

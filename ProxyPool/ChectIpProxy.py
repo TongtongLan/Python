@@ -42,7 +42,7 @@ class ChectIpProxy:
                 if request.text is 'default':
                     succeed = True
 
-            except Exception, e:m
+            except Exception, e:
                 print ('error:',ip)
                 cursor = conn.cursor()
                 # 删除数据表中一行
