@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter
 import requests
 from bs4 import BeautifulSoup
 from utils import HTTPHeaders
-from utils import config
+from utils import config as urtils_config
 import config
 import time
 from datetime import datetime
@@ -27,7 +27,8 @@ class GetProxyStrategy(object):
         session = requests.Session()
         session.mount('https://', HTTPAdapter(max_retries=5))
         session.mount('http://', HTTPAdapter(max_retries=5))
-        response = session.get(proxy_url, headers=HTTPHeaders.HTTPHeader().GetHttpHeader(), timeout=config.TIMEOUT)
+        response = session.get(proxy_url, headers=HTTPHeaders.HTTPHeader().GetxicidailHttpHeader(),
+                               timeout=urtils_config.TIMEOUT)
 
         return response
 
@@ -41,8 +42,18 @@ class Get66ipProxyStrategy(GetProxyStrategy):
 
     URL = config.G66ip_URL
 
+    def HTTP_request(self, proxy_url):
+        session = requests.Session()
+        session.mount('https://', HTTPAdapter(max_retries=5))
+        session.mount('http://', HTTPAdapter(max_retries=5))
+        response = session.get(proxy_url, headers=HTTPHeaders.HTTPHeader().Get66ipHeader(),
+                               timeout=urtils_config.TIMEOUT)
+
+        return response
+
     def crawl_execute(self):
         self.content = self.HTTP_request(self.URL).text
+        print self.content
         self.proxy_list = self.parse(self.content)
         print self.proxy_list
         return self.proxy_list

@@ -22,6 +22,10 @@ class Proxy:
         self.conn = service_connect.service_conn.MySQL_CONN()
         self.redis_client = config.redis_client
 
+
+    def random_choice_proxy(self):
+        pass
+
     #开启爬取指令
     def Crawl(self):
         print('crawl()......')
