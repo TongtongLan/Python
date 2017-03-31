@@ -10,14 +10,14 @@ from DownLoad_mp3 import download_mp3
 import os
 import sys
 import threading
-
+import time
+import tkFileDialog
 basePath = os.path.join(os.getcwd(), r'luowang')
 class luowang_spider():
 
     BASE_URL = 'http://www.luoo.net/music/'
     BASE_DOWNLOAD_URL = "http://mp3-cdn.luoo.net/low/luoo/"
     PAGE_MAX = 904
-
 
     def init(self):
         print u"请输入音乐期刊号:\n>"
@@ -36,11 +36,15 @@ class luowang_spider():
                 print u"输入的数字必须大于0，请重新输入：\n"
             else:
                 break
+        print u"请选择保存路径:\n>"
+        time.sleep(1)
+        directory = tkFileDialog.askdirectory()
+        i = 0
+        while directory is "" and i < 1:
+            i+=1
+            directory = tkFileDialog.askdirectory()
 
-        return vol
-
-
-
+        return vol,directory
 
     def crawl_execute(self, issue):
 
@@ -71,7 +75,10 @@ class luowang_spider():
         return issue_list
 
     def Crawl(self):
-        issue = self.init()
+        issue, directory = self.init()
+        if directory is "":
+            print u"取消下载"
+            return
         issue_list = self.crawl_execute(issue)
         thread =[]
 
@@ -86,7 +93,7 @@ class luowang_spider():
             print download_url
             print (song.get("song_name"))
 
-            filename = "/home/tongtong/音乐/test/" + song.get("song_name").replace ("/","\\").decode('utf-8') + ".mp3"
+            filename = directory + "/"+song.get("song_name").replace ("/","\\").decode('utf-8') + ".mp3"
             print filename
             #download_mp3().download(download_url, filename)
             if len(thread)<10:
@@ -99,9 +106,3 @@ class luowang_spider():
 reload(sys)
 sys.setdefaultencoding('utf-8')
 luowang_spider().Crawl()
-
-
-
-
-
-
