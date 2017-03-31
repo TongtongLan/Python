@@ -16,6 +16,31 @@ class luowang_spider():
 
     BASE_URL = 'http://www.luoo.net/music/'
     BASE_DOWNLOAD_URL = "http://mp3-cdn.luoo.net/low/luoo/"
+    PAGE_MAX = 904
+
+
+    def init(self):
+        print u"请输入音乐期刊号:\n>"
+        vol=""
+        while(True):
+            vol = raw_input()
+            try:
+                page_from = int(vol)
+            except:
+                print u"值有误,请输入大于零的音乐期刊号:\n>"
+                continue
+            if page_from > self.PAGE_MAX:
+                print u"输入的数字大于最大的期刊号，请重新输入：\n"
+                continue
+            elif page_from <=0:
+                print u"输入的数字必须大于0，请重新输入：\n"
+            else:
+                break
+
+        return vol
+
+
+
 
     def crawl_execute(self, issue):
 
@@ -45,7 +70,8 @@ class luowang_spider():
 
         return issue_list
 
-    def Crawl(self, issue):
+    def Crawl(self):
+        issue = self.init()
         issue_list = self.crawl_execute(issue)
         thread =[]
 
@@ -72,8 +98,7 @@ class luowang_spider():
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-issue = 55
-luowang_spider().Crawl(issue=771)
+luowang_spider().Crawl()
 
 
 
