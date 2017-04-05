@@ -3,8 +3,8 @@ import urllib
 download mp3 files
 '''
 
-class download_mp3():
+class Download_Mp3():
 
-    def download(self, url, song_filename):
+    def download_Mp3(self, SongDownloadUrl, SaveSongFileRout):
 
-        urllib.urlretrieve(url, song_filename)
+        urllib.urlretrieve(SongDownloadUrl, SaveSongFileRout)

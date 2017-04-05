@@ -30,8 +30,11 @@ class Proxy:
     def Crawl(self):
         print('crawl()......')
         proxy_list = ProxyStrategy.Get66ipProxyStrategy().crawl_execute()
+        print('crawl()......')
         proxy_list = proxy_list + ProxyStrategy.GetNNProxyStrategy().crawl_execute()
+        print('crawl()......')
         proxy_list = proxy_list + ProxyStrategy.GetWNProxyStrategy().crawl_execute()
+        print('crawl()......')
         proxy_list = proxy_list + ProxyStrategy.GetWTProxyStrategy().crawl_execute()
 
         if len(proxy_list) is 0:
@@ -69,7 +72,7 @@ class Proxy:
             proxy = {'http': 'http://' + ip[0]}
 
             try:
-                requests.get(config.check_IP_URL, proxies=proxy, timeout=5)
+                requests.get(config.check_IP_URL, proxies=proxy, timeout=2)
             except:
                 print ('error:', ip)
                 MySQLexe.MySQLexe().delete_exe(self.conn, ip)

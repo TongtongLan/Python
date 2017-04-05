@@ -6,98 +6,97 @@ download the musics from LUOWANG
 '''
 import requests
 from bs4 import BeautifulSoup
-from DownLoad_mp3 import download_mp3
-import os
+from DownLoad_mp3 import Download_Mp3
 import sys
 import threading
 import time
-import tkFileDialog
-basePath = os.path.join(os.getcwd(), r'luowang')
+import Utils
 class luowang_spider():
 
     BASE_URL = 'http://www.luoo.net/music/'
-    BASE_DOWNLOAD_URL = "http://mp3-cdn.luoo.net/low/luoo/"
-    PAGE_MAX = 904
+    BASE_SONG_DOWNLOAD_URL = "http://mp3-cdn.luoo.net/low/luoo/"
+    SONG_ISSUE_MAX = 904
+    NULL = ''
+    HTML_LABEL_LI = 'li'
+    HTML_LABEL_A = 'a'
+    HTML_LABEL_SPAN = 'span'
 
     def init(self):
         print u"请输入音乐期刊号:\n>"
-        vol=""
+        songIssueNumber = self.NULL
         while(True):
-            vol = raw_input()
-            try:
-                page_from = int(vol)
-            except:
-                print u"值有误,请输入大于零的音乐期刊号:\n>"
-                continue
-            if page_from > self.PAGE_MAX:
+            songIssueNumber = Utils.getSongIssueNumber()
+            if Utils.isIssueNumGreaterThanMax(songIssueNumber):
                 print u"输入的数字大于最大的期刊号，请重新输入：\n"
                 continue
-            elif page_from <=0:
+            elif Utils.isIssueNumLessThanMin(songIssueNumber):
                 print u"输入的数字必须大于0，请重新输入：\n"
             else:
                 break
         print u"请选择保存路径:\n>"
         time.sleep(1)
-        directory = tkFileDialog.askdirectory()
-        i = 0
-        while directory is "" and i < 1:
-            i+=1
-            directory = tkFileDialog.askdirectory()
+        songsSaveDirectory = self.NULL
+        cancelSaveFlag = 0
+        while Utils.isSongsSaveDirectoryNull(songsSaveDirectory) and cancelSaveFlag < 1:
+            cancelSaveFlag += 1
+            songsSaveDirectory = Utils.getSongsSaveDirectory()
 
-        return vol,directory
+        return songIssueNumber, songsSaveDirectory
 
-    def crawl_execute(self, issue):
-
-        # set url
-        URL = self.BASE_URL+str(issue)
-        # get html
-        response = requests.get(URL)
-        # 设置requests编码
-        response.encoding = 'utf-8'
-        content = response.text
+    def parseIssuePage(self, responseContent):
         # 用html5lib解析网页
-        html = BeautifulSoup(content, 'html5lib')
-        li_list = html.findAll('li', {"class": "track-item rounded"})
+        responseContent = Utils.getContentByHtml5lib(responseContent)
 
-        issue_list =  []
+        includeLiLabelList = responseContent.findAll(self.HTML_LABEL_LI, {"class": "track-item rounded"})
 
-        for li in li_list:
+        songsInfoList = []
 
-            song_name = li.find('a',{"class":"trackname btn-play"}).text
-            song_songer = li.find('span',{"class":'artist btn-play'}).text
-            song_list = {
-                "song_name" : song_name,
-                "song_songer" : song_songer
+        for li in includeLiLabelList:
+            songName = li.find(self.HTML_LABEL_A, {"class": 'trackname btn-play'}).text
+            singer = li.find(self.HTML_LABEL_SPAN, {"class": 'artist btn-play'}).text
+            songInfo = {
+                "songName": songName,
+                "singer": singer
             }
 
-            issue_list.append(song_list)
+            songsInfoList.append(songInfo)
 
-        return issue_list
+        return songsInfoList
+
+    def crawlExecute(self, songIssueNumber):
+
+        # set url
+        issueUrl = self.BASE_URL + str(songIssueNumber)
+
+        responseContent = Utils.getResponseContent(issueUrl)
+
+        songsInfoList = self.parseIssuePage(responseContent)
+
+        return songsInfoList
 
     def Crawl(self):
-        issue, directory = self.init()
-        if directory is "":
+        songIssueNumber, songsSaveDirectory = self.init()
+        if songsSaveDirectory is self.NULL:
             print u"取消下载"
             return
-        issue_list = self.crawl_execute(issue)
-        thread =[]
+        songsInfoList = self.crawlExecute(songIssueNumber)
+        thread = []
+        SongDownloadUrl = self.NULL
 
-        for song in issue_list:
-            index = issue_list.index(song)+1
-            if index<10:
-                download_url = self.BASE_DOWNLOAD_URL + "radio" + str(issue) + "/0" + str(
-                    index) + ".mp3"
-            elif index>= 10:
-                download_url = self.BASE_DOWNLOAD_URL + "radio" + str(issue) + "/" + str(
-                    index) + ".mp3"
-            print download_url
-            print (song.get("song_name"))
+        print len(songsInfoList)
 
-            filename = directory + "/"+song.get("song_name").replace ("/","\\").decode('utf-8') + ".mp3"
-            print filename
-            #download_mp3().download(download_url, filename)
-            if len(thread)<10:
-                t = threading.Thread(target=download_mp3().download(download_url, filename))
+        for songInfo in songsInfoList:
+            songNumber = songsInfoList.index(songInfo)+1
+            if songNumber < 10:
+                SongDownloadUrl = self.BASE_SONG_DOWNLOAD_URL + "radio" + str(songIssueNumber) + "/0" + str(
+                    songNumber) + ".mp3"
+            elif songNumber >= 10:
+                SongDownloadUrl = self.BASE_SONG_DOWNLOAD_URL + "radio" + str(songIssueNumber) + "/" + str(
+                    songNumber) + ".mp3"
+
+            SaveSongFileRout = songsSaveDirectory + "/" + songInfo.get("songName").replace("/", "\\").decode('utf-8') + ".mp3"
+            if len(thread) < 15:
+                t = threading.Thread(target=Download_Mp3().download_Mp3(SongDownloadUrl, SaveSongFileRout))
                 thread.append(t)
                 t.setDaemon(True)
                 print("start one thread")

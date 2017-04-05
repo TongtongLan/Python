@@ -48,6 +48,7 @@ class Get66ipProxyStrategy(GetProxyStrategy):
         session.mount('http://', HTTPAdapter(max_retries=5))
         response = session.get(proxy_url, headers=HTTPHeaders.HTTPHeader().Get66ipHeader(),
                                timeout=urtils_config.TIMEOUT)
+        print response.status_code
 
         return response
 
