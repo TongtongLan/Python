@@ -103,6 +103,7 @@ class myArray(object):
         self.head = self.head._next
 
     def remove(self, index):
+        log().logBeforeMethod("remove(self, index)")
         if self.__isOperate(index):
             print ('remove')
             if index is 0:
