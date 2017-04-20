@@ -25,18 +25,38 @@ class doubleEndedList:
         self.__doClear()
 
     def clear(self):
+        '''
+        clear the current array list
+        '''
         Log.log().logBeforeMethod("clear(self)")
         self.__doClear()
 
     def __doClear(self):
+        '''
+        clear operation
+        '''
         self.theSize = INITIALIZATION_THE_SIZE_OF_LIST
         self.head = doubleEndedList_Node(None)
         self.head.last = self.head
 
     def __packageNode(self, element):
+        '''
+        package the element into node
+        :param element:
+        :return: node
+        '''
         return doubleEndedList_Node(element)
 
     def __doInsert(self, index, insertedElement):
+        '''
+        insert operation
+        :param index: 数据项插入的位置
+        :param insertedElement: 数据项
+
+        insert as first node
+        insert as last node
+        insert other location
+        '''
         if index is INITIALIZATION_INDEX:
             self.insertFirstNode(insertedElement)
         elif index is self.theSize:
@@ -44,12 +64,20 @@ class doubleEndedList:
         else:
             self.__insertMiddleNode(index, insertedElement)
 
-    def __insertInEmptyList(self, newNode):
+    def __insertFirstNodeInEmptyList(self, newNode):
+        '''
+        insert a new node as first node in an empty list
+        :param newNode: inserted node
+        '''
         self.head = newNode
         self.head.last = self.head
         self.theSize = self.auto_Increment(self.theSize)
 
-    def __insertInNotEmptyList(self, newNode):
+    def __insertFirstNodeInNotEmptyList(self, newNode):
+        '''
+        insert a new node as first node in a nonempty list
+        :param newNode: inserted node
+        '''
         nextNode = self.head
         self.head = newNode
         self.head._next = nextNode
@@ -57,6 +85,11 @@ class doubleEndedList:
         self.theSize = self.auto_Increment(self.theSize)
 
     def __insertMiddleNode(self, index, element):
+        '''
+        insert a new element in middle of a nonempty list
+        :param index: the index of inserted element
+        :param element: inserted element
+        '''
         self.theSize = self.auto_Increment(self.theSize)
         insertedNode = doubleEndedList_Node(element)
         beforeInsertedNode = self.findNodeWithIndex(self.auto_Decrement(index))
@@ -64,6 +97,9 @@ class doubleEndedList:
         beforeInsertedNode._next = insertedNode
 
     def __doPrintList(self):
+        '''
+        print current list
+        '''
         currentNode = self.head
         count = 0
         while (currentNode is not None):
@@ -72,6 +108,10 @@ class doubleEndedList:
             count = self.auto_Increment(count)
 
     def __deleteMiddleNode(self, index):
+        '''
+        delete the node at the index
+        :param index:
+        '''
         preOfTheIndexNode = self.findNodeWithIndex(self.auto_Decrement(index))
         deletedNode = preOfTheIndexNode._next
         preOfTheIndexNode._next = deletedNode._next
@@ -79,6 +119,14 @@ class doubleEndedList:
         self.theSize = self.auto_Decrement(self.theSize)
 
     def __doDelete(self, index):
+        '''
+        delete operation
+        :param index: the index of deleted node
+
+        delete the first node
+        delete the last node
+        delete the other node
+        '''
         if index is INITIALIZATION_INDEX:
             self.deleteFristNode()
         elif index is self.auto_Decrement(self.theSize):
@@ -93,21 +141,37 @@ class doubleEndedList:
         return variable - 1
 
     def isEmpty(self):
+        '''
+        :return: if current list is empty
+        '''
         if self.theSize is INITIALIZATION_THE_SIZE_OF_LIST:
             return True
         return False
 
     def insertFirstNode(self, insertetElement):
+        '''
+        insert the element as the first node
+        :param insertetElement: inserted element
+        '''
         Log.log().logBeforeMethod("insertFirstNode(self, insertetElement)")
         if self.isEmpty():
-            self.__insertInEmptyList(self.__packageNode(insertetElement))
+            self.__insertFirstNodeInEmptyList(self.__packageNode(insertetElement))
         else:
-            self.__insertInNotEmptyList(self.__packageNode(insertetElement))
+            self.__insertFirstNodeInNotEmptyList(self.__packageNode(insertetElement))
 
     def insertLastNode(self, element):
+        '''
+        insert the element as the last node
+        :param element: inserted element
+        '''
         pass
 
     def findNodeWithIndex(self, index):
+        '''
+        find node by the index
+        :param index:
+        :return: node at the index
+        '''
         currentNode = self.head
         count = 0
         while (count < index):
@@ -116,18 +180,30 @@ class doubleEndedList:
         return currentNode
 
     def isIndexOut(self, index):
+        '''
+        :param index:
+        :return: if the index is out of current array list
+        '''
         if index < INITIALIZATION_INDEX or index > self.theSize:
             print ("Array out error")
             return True
         return False
 
     def insert(self, index, insertedElement):
+        '''
+        insert element
+        :param index: the index of inserted element
+        :param insertedElement: inserted element
+        '''
         if self.isIndexOut(index):
             print ("Array out error")
         else:
             self.__doInsert(index, insertedElement)
 
     def printList(self):
+        '''
+        print current array list
+        '''
         Log.log().logBeforeMethod("printList(self)")
         if self.isEmpty():
             print "The List is NULL"
@@ -135,14 +211,23 @@ class doubleEndedList:
             self.__doPrintList()
 
     def printLastNode(self):
+        '''
+        print the last element in current array list and return the last node
+        :return: the last node
+        '''
         Log.log().logBeforeMethod("printLastNode(self)")
-        if self.head.last is None:
-            print (self.head.element)
-            return
-        print ("print last node")
-        print (self.head.last.element)
+        if self.isEmpty():
+            return None
+        else:
+            print (self.head.last)
+            return self.head.last
 
     def contain(self, element):
+        '''
+        if the element contained in current array list
+        :param element:
+        :return: if the element contained in current array list, return True
+        '''
         Log.log().logBeforeMethod("contain(self, element)")
         if self.isEmpty():
             return False
@@ -152,6 +237,11 @@ class doubleEndedList:
             return False
 
     def findWithElement(self, element):
+        '''
+        find the node by element
+        :param element:
+        :return: if the element in current list, return the node
+        '''
         Log.log().logBeforeMethod("findWithElement(self, element)")
         currentNode = self.head
         while(currentNode is not None):
@@ -160,18 +250,28 @@ class doubleEndedList:
             currentNode = currentNode._next
 
     def deleteFristNode(self):
+        '''
+        delete the first node in current array list
+        '''
         self.head = self.head._next
         self.theSize = self.auto_Decrement(self.theSize)
 
     def deleteLastNode(self):
+        '''
+        delete the last node in current array list
+        '''
         Log.log().logBeforeMethod("deleteLastNode(self)")
         newLastNode = self.findNodeWithIndex(self.theSize - 2)
-        print (newLastNode.element)
         self.head.last = newLastNode
         newLastNode._next = None
         self.theSize = self.auto_Decrement(self.theSize)
 
     def delete(self, index):
+        '''
+        delete the node witch at the index
+        :param index:
+        :return:
+        '''
         Log.log().logBeforeMethod("delete(self, index)")
         if self.isEmpty():
             return
@@ -180,6 +280,9 @@ class doubleEndedList:
         self.__doDelete(index)
 
     def lenOfList(self):
+        '''
+        :return: the length of current array list
+        '''
         Log.log().logBeforeMethod("lenOfList(self)")
         count = 0
         currentNode = self.head
@@ -194,6 +297,7 @@ class doubleEndedList:
 
 testDoubleEndedList = doubleEndedList()
 print (testDoubleEndedList.theSize)
+print (testDoubleEndedList.printLastNode())
 print (testDoubleEndedList.isEmpty())
 testDoubleEndedList.insertFirstNode(123)
 print (testDoubleEndedList.lenOfList())
