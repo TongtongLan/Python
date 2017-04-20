@@ -5,12 +5,14 @@
 结点插入（任意位置插入、链表表头插入、链表表尾插入）
 遍历打印链表数据项
 根据索引查询数据项
-
-删除
+删除（任意位置删除、链表表头删除、链表表尾删除）
 '''
 
 import Node
 import Log
+
+INITIALIZATION_INDEX = 0
+INITIALIZATION_THE_SIZE_OF_LIST = 0
 
 
 class doubleEndedList_Node(Node.nodeStructure):
@@ -27,7 +29,7 @@ class doubleEndedList:
         self.__doClear()
 
     def __doClear(self):
-        self.theSize = 0
+        self.theSize = INITIALIZATION_THE_SIZE_OF_LIST
         self.head = doubleEndedList_Node(None)
         self.head.last = self.head
 
@@ -35,7 +37,7 @@ class doubleEndedList:
         return doubleEndedList_Node(element)
 
     def __doInsert(self, index, insertedElement):
-        if index is 0:
+        if index is INITIALIZATION_INDEX:
             self.insertFirstNode(insertedElement)
         elif index is self.theSize:
             self.insertLastNode(insertedElement)
@@ -57,17 +59,32 @@ class doubleEndedList:
     def __insertMiddleNode(self, index, element):
         self.theSize = self.auto_Increment(self.theSize)
         insertedNode = doubleEndedList_Node(element)
-        beforeInsertedNode = self.findNodeByIndex(self.auto_Decrement(index))
+        beforeInsertedNode = self.findNodeWithIndex(self.auto_Decrement(index))
         insertedNode._next = beforeInsertedNode._next
         beforeInsertedNode._next = insertedNode
 
     def __doPrintList(self):
         currentNode = self.head
         count = 0
-        while (currentNode is not None and count < self.theSize):
+        while (currentNode is not None):
             print (currentNode.element)
             currentNode = currentNode._next
             count = self.auto_Increment(count)
+
+    def __deleteMiddleNode(self, index):
+        preOfTheIndexNode = self.findNodeWithIndex(self.auto_Decrement(index))
+        deletedNode = preOfTheIndexNode._next
+        preOfTheIndexNode._next = deletedNode._next
+        deletedNode._next = None
+        self.theSize = self.auto_Decrement(self.theSize)
+
+    def __doDelete(self, index):
+        if index is INITIALIZATION_INDEX:
+            self.deleteFristNode()
+        elif index is self.auto_Decrement(self.theSize):
+            self.deleteLastNode()
+        else:
+            self.__deleteMiddleNode(index)
 
     def auto_Increment(self, variable):
         return variable + 1
@@ -76,7 +93,7 @@ class doubleEndedList:
         return variable - 1
 
     def isEmpty(self):
-        if self.theSize is 0:
+        if self.theSize is INITIALIZATION_THE_SIZE_OF_LIST:
             return True
         return False
 
@@ -90,16 +107,16 @@ class doubleEndedList:
     def insertLastNode(self, element):
         pass
 
-    def findNodeByIndex(self, index):
+    def findNodeWithIndex(self, index):
         currentNode = self.head
-        count = 1
+        count = 0
         while (count < index):
             currentNode = currentNode._next
             count = self.auto_Increment(count)
         return currentNode
 
     def isIndexOut(self, index):
-        if index < 0 or index > self.theSize:
+        if index < INITIALIZATION_INDEX or index > self.theSize:
             print ("Array out error")
             return True
         return False
@@ -142,6 +159,35 @@ class doubleEndedList:
                 return currentNode
             currentNode = currentNode._next
 
+    def deleteFristNode(self):
+        self.head = self.head._next
+        self.theSize = self.auto_Decrement(self.theSize)
+
+    def deleteLastNode(self):
+        Log.log().logBeforeMethod("deleteLastNode(self)")
+        newLastNode = self.findNodeWithIndex(self.theSize - 2)
+        print (newLastNode.element)
+        self.head.last = newLastNode
+        newLastNode._next = None
+        self.theSize = self.auto_Decrement(self.theSize)
+
+    def delete(self, index):
+        Log.log().logBeforeMethod("delete(self, index)")
+        if self.isEmpty():
+            return
+        if self.isIndexOut(index):
+            return
+        self.__doDelete(index)
+
+    def lenOfList(self):
+        Log.log().logBeforeMethod("lenOfList(self)")
+        count = 0
+        currentNode = self.head
+        while(currentNode is not None):
+            currentNode = currentNode._next
+            count = self.auto_Increment(count)
+        return count
+
 
 
 
@@ -150,6 +196,7 @@ testDoubleEndedList = doubleEndedList()
 print (testDoubleEndedList.theSize)
 print (testDoubleEndedList.isEmpty())
 testDoubleEndedList.insertFirstNode(123)
+print (testDoubleEndedList.lenOfList())
 testDoubleEndedList.printLastNode()
 testDoubleEndedList.insertFirstNode(345)
 print (testDoubleEndedList.theSize)
@@ -163,8 +210,14 @@ print (testDoubleEndedList.findWithElement(23))
 print (testDoubleEndedList.findWithElement(467))
 print (testDoubleEndedList.contain(11))
 print (testDoubleEndedList.contain(467))
+testDoubleEndedList.printList()
+testDoubleEndedList.deleteLastNode()
+testDoubleEndedList.printList()
+testDoubleEndedList.delete(testDoubleEndedList.theSize-2)
+testDoubleEndedList.printList()
 
 print (testDoubleEndedList.theSize)
+print (testDoubleEndedList.lenOfList())
 testDoubleEndedList.printLastNode()
 testDoubleEndedList.printList()
 testDoubleEndedList.clear()
